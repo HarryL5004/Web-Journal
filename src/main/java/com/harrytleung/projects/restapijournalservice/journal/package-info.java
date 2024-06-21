@@ -1,0 +1,1 @@
+package com.harrytleung.projects.restapijournalservice.journal;
