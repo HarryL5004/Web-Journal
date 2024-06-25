@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import halfred from 'halfred';
-import JournalViewer from '../ui/JournalViewer';
+import JournalViewer from '../ui/journal/JournalViewer';
 
 export default async function Dashboard() {
     let journalList = await getJournalList();
