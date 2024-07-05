@@ -11,7 +11,7 @@ import { Journal } from '../../lib/types';
 
 type Prop = {
     journal: Journal,
-    openJournal: (url: string) => void,
+    openJournal: (journal: Journal) => void,
     deleteJournal: (id: string) => void,
 }
 
@@ -21,8 +21,8 @@ export default function JournalCard( { journal, openJournal, deleteJournal }: Pr
     const handleClickOnJournal = async(e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault();
 
-        let pagesLink: string = journal.actionLinks.pages.href;
-        openJournal(pagesLink);
+        // let pagesLink: string = journal.actionLinks.pages.href;
+        openJournal(journal);
     }
 
     const handleEditJournal = (e: React.MouseEvent<HTMLElement>) => {

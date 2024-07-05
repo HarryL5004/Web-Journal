@@ -24,5 +24,5 @@ export interface Page {
     content: string;
     lastUpdatedTime: string;
     journalId: string;
-    links: ActionLinkCollection;
+    actionLinks: ActionLinkCollection;
 }

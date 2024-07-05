@@ -8,6 +8,7 @@ import JournalCard from './JournalCard';
 import PageViewer from '../page/PageViewer';
 import NewJournalDialog from './NewJournalDialog';
 import { ActionLinkCollection, Journal, Page } from '../../lib/types';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 type Props = {
     allJournalUrl: string,
@@ -15,12 +16,11 @@ type Props = {
 
 export default function JournalViewer({ allJournalUrl }: Props) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [activeJournal, setActiveJournal] = useState<Journal>();
     const [journals, setJournals] = useState<Journal[]>([]);
     const [journalActionLinks, setJournalActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
-    const [pageActionLinks, setPageActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
-    const [pages, setPages] = useState<Page[]>([]);
 
-    async function handleClickForAllJournals() {
+    async function refreshAllJournals() {
         const resp = await fetchData(allJournalUrl);
         if (!resp.ok)
             return;
@@ -42,39 +42,25 @@ export default function JournalViewer({ allJournalUrl }: Props) {
     
         setJournals(journalArr);
         setActiveIndex(0);
-    }
+    };
 
-    async function handleClickForSingleJournal(url: string) {
-        const resp = await fetchData(url);
-        if (!resp.ok)
-            return;
-
-        const jsonData = await resp.json();
-        const resource: halfred.Resource = halfred.parse(jsonData);
-
-        setPageActionLinks(extractActionLinks(resource));
-        let pageArr: Page[] = [];
-
-        if (resource.allEmbeddedResources().pageList !== undefined) {
-            for (let pageResource of resource.allEmbeddedResources().pageList) {
-                let page: Page = pageResource.original() as Page;
-                page.links = extractActionLinks(pageResource);
-                pageArr.push(page);
-            }
-        }
-
-        setPages(pageArr);
+    async function handleClickForSingleJournal(journal: Journal) {
+        setActiveJournal(journal);
         setActiveIndex(1);
-    }
+    };
 
     const addJournal = (journal: Journal) => {
         setJournals([...journals, journal]);
-    }
+    };
 
     const deleteJournal = (id: string) => {
         const remainingJournals = journals.filter(j => j.id != id);
         setJournals(remainingJournals);
-    }
+    };
+
+    const backToJournal = () => {
+        setActiveIndex(0);
+    };
 
     return (
         <div>
@@ -82,9 +68,9 @@ export default function JournalViewer({ allJournalUrl }: Props) {
                 <Button variant="contained"
                         onClick={ (e) => {
                             e.preventDefault();
-                            handleClickForAllJournals();
+                            refreshAllJournals();
                         }}>
-                            Get All Journals
+                            <RefreshIcon />
                 </Button>
             }
 
@@ -109,14 +95,8 @@ export default function JournalViewer({ allJournalUrl }: Props) {
                     </Stack>
                 }
                 {
-                    activeIndex == 1 &&
-                    <div className='flex flex-row justify-start '>
-                        {
-                            pages.map( (page) => (
-                                <PageViewer key={page.id} page={page} pageActionLinks={ pageActionLinks }/>
-                            ))
-                        }
-                    </div>
+                    (activeIndex == 1) && (activeJournal !== undefined) &&
+                    <PageViewer journal={ activeJournal } backToJournal={ backToJournal }/>
                 }
             </Container>
         </div>

@@ -10,7 +10,7 @@ export default async function Dashboard() {
         <div className='flex min-h-screen flex-col justify-around p-5'>
             <Link key='Root' href='/'
                   className="text-4xl font-extrabold dark:text-white">
-                Journal App
+                Journal Web App
             </Link>
             { journalList }
         </div>

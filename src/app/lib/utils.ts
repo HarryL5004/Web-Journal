@@ -21,6 +21,14 @@ export async function putData(url: string, data: any): Promise<Response> {
     });
 }
 
+export async function patchData(url: string, data: any): Promise<Response> {
+    return await fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: data,
+    });
+}
+
 export async function deleteData(url: string): Promise<Response> {
     return await fetch(url, {
         method: 'DELETE',
@@ -59,17 +67,23 @@ function getLink(resource: halfred.Resource, linkKey: string): ActionLink {
     return {href: resource.link(linkKey).href, templated: isTemplated}
 }
 
-// function getNonTemplatedLink(resource: halfred.Resource, linkKey: string) {
-//     let link = resource.link(linkKey).href;
-//     if (resource.link(linkKey).templated)
-//         link = link.substring(0, link.indexOf('{'));
-//     return link;
-// }
-
-export function getLinkFromTemplate(link: ActionLink, value: string): string {
+export function getLinkFromTemplate(link: ActionLink, ...value: string[]): string {
     if (!link.templated)
         return link.href;
 
-    return link.href.replace(link.href.substring(link.href.indexOf('{'), link.href.indexOf('}')), 
-        value)
+    let url = link.href;
+    let beginIndex = 0;
+    let endIndex = 0;
+    value.forEach((val, i) => {
+        beginIndex = url.indexOf('{', beginIndex);
+        endIndex = url.indexOf('}', beginIndex + 1);
+        if (beginIndex == -1 || endIndex == -1)
+            return link.href;
+
+        url = url.replace(url.substring(beginIndex, endIndex + 1), val);
+
+        beginIndex++;
+    });
+
+    return url;
 }

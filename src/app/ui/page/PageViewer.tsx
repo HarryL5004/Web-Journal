@@ -1,21 +1,72 @@
-import { ActionLinkCollection, Page } from "@/app/lib/types";
-import { Card, CardContent } from "@mui/material";
+'use client';
+
+import { ActionLinkCollection, Journal, Page } from "@/app/lib/types";
+import { Button, Card, CardActions, CardContent, Stack, TextField } from "@mui/material";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import React, { useEffect, useState } from "react";
+import NewPageDialog from "./NewPageDialog";
+import PageCard from "./PageCard";
+import { extractActionLinks, fetchData } from "@/app/lib/utils";
+import halfred from "halfred";
 
 type Prop = {
-    page: Page
-    pageActionLinks: ActionLinkCollection
+    journal: Journal
+    backToJournal: () => void
 }
 
-export default function PageViewer({ page, pageActionLinks }: Prop) {
+export default function PageViewer({ journal, backToJournal }: Prop) {
+    const [pages, setPages] = useState<Page[]>([]);
+    const [pageActionLinks, setPageActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
+
+    useEffect(() => {
+        loadPages(journal.actionLinks.pages.href)
+        console.log("using eff")
+    }, []);
+
+    async function loadPages(url: string) {
+        const resp = await fetchData(url);
+        if (!resp.ok)
+            return;
+
+        const jsonData = await resp.json();
+        const resource: halfred.Resource = halfred.parse(jsonData);
+
+        setPageActionLinks(extractActionLinks(resource));
+        let pageArr: Page[] = [];
+
+        if (resource.allEmbeddedResources().pageList !== undefined) {
+            for (let pageResource of resource.allEmbeddedResources().pageList) {
+                let page: Page = pageResource.original() as Page;
+                page.actionLinks = extractActionLinks(pageResource);
+                pageArr.push(page);
+            }
+        }
+
+        setPages(pageArr);
+    };
+
+    const addPage = (page: Page) => {
+        setPages([...pages, page]);
+    };
+
+    const deletePage = (pageId: string) => {
+        const remainingPages = pages.filter(p => p.id != pageId);
+        setPages(remainingPages);
+    };
+
     return (
-        <Card>
-            <CardContent>
-                <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
-                    {page.title}
-                </h4>
-                <p>{page.lastUpdatedTime}</p>
-                <p>{page.content}</p>
-            </CardContent>
-        </Card>
+        <React.Fragment>
+            <Button onClick={ backToJournal }>
+                <ArrowBackIcon />
+            </Button>
+            <NewPageDialog journalId={ journal.id } actionLink={ pageActionLinks.insert } addPage={ addPage } />
+            <Stack spacing={2}>
+                {
+                    pages.map( (page) => (
+                        <PageCard key={ page.id } page={ page } deletePage={ deletePage }/>
+                    ))
+                }
+            </Stack>
+        </React.Fragment>
     );
 }

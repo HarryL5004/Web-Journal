@@ -8,8 +8,8 @@ import theme from './theme'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Journal App",
-  description: "A REST based journal app.",
+  title: "Journal Web App",
+  description: "A REST based journal web app.",
 };
 
 export default function RootLayout({
