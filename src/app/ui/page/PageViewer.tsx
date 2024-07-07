@@ -31,9 +31,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
         const jsonData = await resp.json();
         const resource: halfred.Resource = halfred.parse(jsonData);
 
-        setPageActionLinks(extractActionLinks(resource));
         let pageArr: Page[] = [];
-
         if (resource.allEmbeddedResources().pageList !== undefined) {
             for (let pageResource of resource.allEmbeddedResources().pageList) {
                 let page: Page = pageResource.original() as Page;
@@ -43,6 +41,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
         }
 
         setPages(pageArr);
+        setPageActionLinks(extractActionLinks(resource));
     };
 
     const addPage = (page: Page) => {

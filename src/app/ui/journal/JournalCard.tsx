@@ -46,7 +46,7 @@ export default function JournalCard( { journal, openJournal, deleteJournal }: Pr
 
     return (
         <React.Fragment>
-            <Card sx={{maxWidth: 345}}>
+            <Card sx={{minWidth: 200, maxWidth: 345}}>
                 <CardActionArea onClick={ handleClickOnJournal }>
                     <CardContent>
                         <h4>{journal.name}</h4>

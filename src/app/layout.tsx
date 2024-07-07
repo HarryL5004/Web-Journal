@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Journal Web App",
-  description: "A REST based journal web app.",
+  description: "A journal web app supported by a RESTful API.",
 };
 
 export default function RootLayout({

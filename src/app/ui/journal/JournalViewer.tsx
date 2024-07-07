@@ -1,26 +1,28 @@
 'use client';
 
 import halfred from 'halfred';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { extractActionLinks, fetchData, getLinkFromTemplate } from '../../lib/utils';
 import { Button, Container, Stack } from '@mui/material';
 import JournalCard from './JournalCard';
-import PageViewer from '../page/PageViewer';
 import NewJournalDialog from './NewJournalDialog';
 import { ActionLinkCollection, Journal, Page } from '../../lib/types';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 type Props = {
     allJournalUrl: string,
+    clickOnJournal: (journal: Journal) => void,
 }
 
-export default function JournalViewer({ allJournalUrl }: Props) {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [activeJournal, setActiveJournal] = useState<Journal>();
+export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) {
     const [journals, setJournals] = useState<Journal[]>([]);
     const [journalActionLinks, setJournalActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
 
-    async function refreshAllJournals() {
+    useEffect(() => {
+        loadAllJournals();
+    }, []);
+
+    async function loadAllJournals() {
         const resp = await fetchData(allJournalUrl);
         if (!resp.ok)
             return;
@@ -41,12 +43,10 @@ export default function JournalViewer({ allJournalUrl }: Props) {
         }
     
         setJournals(journalArr);
-        setActiveIndex(0);
     };
 
     async function handleClickForSingleJournal(journal: Journal) {
-        setActiveJournal(journal);
-        setActiveIndex(1);
+        clickOnJournal(journal);
     };
 
     const addJournal = (journal: Journal) => {
@@ -58,24 +58,18 @@ export default function JournalViewer({ allJournalUrl }: Props) {
         setJournals(remainingJournals);
     };
 
-    const backToJournal = () => {
-        setActiveIndex(0);
-    };
-
     return (
         <div>
             {
                 <Button variant="contained"
                         onClick={ (e) => {
                             e.preventDefault();
-                            refreshAllJournals();
+                            loadAllJournals();
                         }}>
                             <RefreshIcon />
                 </Button>
             }
-
             {
-                activeIndex == 0 && 
                 journalActionLinks.insert.href !== undefined && 
                 <NewJournalDialog url={ journalActionLinks.insert.href }
                             addJournal={ addJournal }/>
@@ -83,8 +77,7 @@ export default function JournalViewer({ allJournalUrl }: Props) {
 
             <Container maxWidth="sm">
                 {
-                    activeIndex == 0 &&
-                    <Stack spacing={2}>
+                    <Stack spacing={{ xs: 1, sm: 2, md: 4 }} direction="row" useFlexGap flexWrap="wrap">
                         {
                             journals.map( (j) => (
                                 <JournalCard key={j.id} journal={j} 
@@ -93,10 +86,6 @@ export default function JournalViewer({ allJournalUrl }: Props) {
                             ))
                         }
                     </Stack>
-                }
-                {
-                    (activeIndex == 1) && (activeJournal !== undefined) &&
-                    <PageViewer journal={ activeJournal } backToJournal={ backToJournal }/>
                 }
             </Container>
         </div>
