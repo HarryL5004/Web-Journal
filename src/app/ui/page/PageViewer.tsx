@@ -20,8 +20,9 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
     useEffect(() => {
         loadPages(journal.actionLinks.pages.href)
-        console.log("using eff")
     }, []);
+
+    // todo useEffect on page Id
 
     async function loadPages(url: string) {
         const resp = await fetchData(url);

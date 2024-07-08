@@ -37,11 +37,11 @@ export default function EditJournalDialog({ journal, open, onClose }: Props) {
             let resJournal = resource.original() as Journal;
             journal.id = resJournal.id;
             journal.name = resJournal.name;
+            journal.locked = resJournal.locked;
             journal.actionLinks = extractActionLinks(resource);
 
             handleClose();
         }
-
     };
 
     return (
@@ -52,7 +52,6 @@ export default function EditJournalDialog({ journal, open, onClose }: Props) {
                     onSubmit: handleSubmit,
                 }}>
             <DialogTitle>Edit Journal</DialogTitle>
-
             <DialogContent>
                 <TextField
                         autoFocus
@@ -70,7 +69,6 @@ export default function EditJournalDialog({ journal, open, onClose }: Props) {
                         }}>
                 </TextField>
             </DialogContent>
-
             <DialogActions>
                 <Button onClick={ handleClose }>Cancel</Button>
                 <Button type="submit">Update</Button>

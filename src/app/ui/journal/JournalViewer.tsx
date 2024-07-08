@@ -2,17 +2,28 @@
 
 import halfred from 'halfred';
 import { useEffect, useState } from 'react';
-import { extractActionLinks, fetchData, getLinkFromTemplate } from '../../lib/utils';
-import { Button, Container, Stack } from '@mui/material';
-import JournalCard from './JournalCard';
-import NewJournalDialog from './NewJournalDialog';
-import { ActionLinkCollection, Journal, Page } from '../../lib/types';
+import { Button, Stack } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
+
+import { extractActionLinks, fetchData, getLinkFromTemplate } from '../../lib/utils';
+import JournalCard from './JournalCard';
+import NewJournalCard from './NewJournalCard';
+import { ActionLinkCollection, Journal } from '../../lib/types';
+
 
 type Props = {
     allJournalUrl: string,
     clickOnJournal: (journal: Journal) => void,
 }
+
+const baseCardStyles = {
+    minWidth: 200,
+    maxWidth: 345,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+};
 
 export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) {
     const [journals, setJournals] = useState<Journal[]>([]);
@@ -32,8 +43,6 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
 
         let journalArr: Journal[] = [];
 
-        setJournalActionLinks(extractActionLinks(resource));
-
         if (resource.allEmbeddedResources().journalList !== undefined) {
             for (let journalResource of resource.allEmbeddedResources().journalList) {
                 let journal: Journal = journalResource.original() as Journal;
@@ -43,15 +52,16 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
         }
     
         setJournals(journalArr);
-    };
-
-    async function handleClickForSingleJournal(journal: Journal) {
-        clickOnJournal(journal);
+        setJournalActionLinks(extractActionLinks(resource));
     };
 
     const addJournal = (journal: Journal) => {
         setJournals([...journals, journal]);
     };
+
+    const updateJournal = (journal: Journal) => {
+        setJournals([journal, ...journals.filter(j => j.id != journal.id)]);
+    }
 
     const deleteJournal = (id: string) => {
         const remainingJournals = journals.filter(j => j.id != id);
@@ -59,8 +69,8 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
     };
 
     return (
-        <div>
-            {
+        <Grid container maxWidth="lg" rowSpacing={5}>
+            <Grid xs={12}>
                 <Button variant="contained"
                         onClick={ (e) => {
                             e.preventDefault();
@@ -68,26 +78,25 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
                         }}>
                             <RefreshIcon />
                 </Button>
-            }
-            {
-                journalActionLinks.insert.href !== undefined && 
-                <NewJournalDialog url={ journalActionLinks.insert.href }
-                            addJournal={ addJournal }/>
-            }
-
-            <Container maxWidth="sm">
-                {
-                    <Stack spacing={{ xs: 1, sm: 2, md: 4 }} direction="row" useFlexGap flexWrap="wrap">
-                        {
-                            journals.map( (j) => (
-                                <JournalCard key={j.id} journal={j} 
-                                    openJournal={ handleClickForSingleJournal }
-                                    deleteJournal={ deleteJournal } />
-                            ))
-                        }
-                    </Stack>
-                }
-            </Container>
-        </div>
+            </Grid>
+            <Grid xs={12}>
+                <Stack spacing={{ xs: 1, sm: 2, md: 4 }} direction="row" useFlexGap flexWrap="wrap">
+                    {
+                        journalActionLinks.insert.href !== undefined && 
+                        <NewJournalCard url={ journalActionLinks.insert.href }
+                                    addJournal={ addJournal } styles={ baseCardStyles } />
+                    }
+                    {
+                        journals.map( (j) => (
+                            <JournalCard key={j.id} journal={j} 
+                                openJournal={ () => clickOnJournal(j) }
+                                updateJournal={ updateJournal }
+                                deleteJournal={ deleteJournal }
+                                styles={ baseCardStyles } />
+                        ))
+                    }
+                </Stack>
+            </Grid>
+        </Grid>
     )
 }

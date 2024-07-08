@@ -27,12 +27,13 @@ export default function Dashboard({ links }: Props) {
 
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="lg">
             {
                 actionLinks['all-journals'] === undefined &&
                 <div>Failed to connect to server.</div>
             }
-            { activeIndex === 0 &&
+            { 
+                activeIndex === 0 &&
                 <JournalViewer allJournalUrl={ getLinkFromTemplate(actionLinks['all-journals'], '') }
                     clickOnJournal={ handleClickOnJournal }
                  />

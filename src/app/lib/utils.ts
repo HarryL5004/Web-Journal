@@ -53,11 +53,6 @@ export function extractActionLinks(resource: halfred.Resource): ActionLinkCollec
             actionLinkCol[linkKey] = getLink(resource, linkKey);
     }
 
-    if (actionLinkCol.update.href === undefined)
-        actionLinkCol.update = getLink(resource, 'self');
-    if (actionLinkCol.delete.href === undefined)
-        actionLinkCol.delete = getLink(resource, 'self');
-
     return actionLinkCol;
 }
 

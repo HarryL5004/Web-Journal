@@ -15,6 +15,7 @@ export interface ActionLink {
 export interface Journal {
     id: string;
     name: string;
+    locked: boolean;
     actionLinks: ActionLinkCollection;
 }
 

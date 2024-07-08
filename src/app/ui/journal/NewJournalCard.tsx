@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, TextField } from "@mui/material";
+import { Button, Card, CardActionArea, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import React from "react";
 import { extractActionLinks, postData } from "../../lib/utils";
@@ -8,10 +8,10 @@ import { Journal } from "../../lib/types";
 interface Props {
     url: string
     addJournal: (j: Journal) => void
+    styles: {}
 }
 
-
-export default function NewJournalDialog({ url, addJournal }: Props) {
+export default function NewJournalCard({ url, addJournal, styles }: Props) {
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
@@ -41,10 +41,12 @@ export default function NewJournalDialog({ url, addJournal }: Props) {
 
     return (
         <React.Fragment>
-            <Fab color='primary' onClick={ handleClickOpen }>
-                <AddIcon />
-            </Fab>
-
+             <Card sx={ styles }>
+                <CardActionArea onClick={ handleClickOpen }
+                                sx={{ height: "100%", display: "flex", flexDirection: "row" }}>
+                    <AddIcon fontSize="large"/>
+                </CardActionArea>
+            </Card>
             <Dialog open={ open } onClose={ handleClose }
                     disableRestoreFocus={ true }
                     PaperProps={{
@@ -53,7 +55,6 @@ export default function NewJournalDialog({ url, addJournal }: Props) {
                     }}>
 
                 <DialogTitle>New Journal</DialogTitle>
-
                 <DialogContent>
                     <TextField 
                         autoFocus
@@ -67,7 +68,6 @@ export default function NewJournalDialog({ url, addJournal }: Props) {
                         variant="standard"
                     />
                 </DialogContent>
-
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
                     <Button type="submit">Add</Button>
