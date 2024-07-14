@@ -1,10 +1,10 @@
 package com.harrytleung.projects.restapijournalservice.journal;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface JournalRepository extends MongoRepository<Journal, String> {
     // @Query("{name:'?0'}")
-    List<Journal> findJournalsByNameLike(String name);
+    Page<Journal> findJournalsByNameLike(String name, Pageable pageable);
 }

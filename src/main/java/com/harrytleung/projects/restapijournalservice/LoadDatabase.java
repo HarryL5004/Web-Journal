@@ -23,18 +23,22 @@ public class LoadDatabase {
     CommandLineRunner initDb(JournalRepository journalRepository, PageRepository pageRepository) {
         return args -> {
             journalRepository.deleteAll();
-            journalRepository.save(new Journal("1", "Test Journal 1"));
-            journalRepository.save(new Journal("2", "Test Journal 2"));
-
-            journalRepository.findAll().forEach(journal -> log.info("Preloaded journal: " + journal.getName()));
-            journalRepository.findById("1").ifPresent(journal -> log.info("Test finding journal using id: " + journal.getName()));
-
             pageRepository.deleteAll();
-            pageRepository.save(new Page("1", "Journal 1 Test Page 1", "Page 1 Content", LocalDateTime.now(), "1"));
-            pageRepository.save(new Page("2", "Journal 1 Test Page 2", "Page 2 Content", LocalDateTime.now(), "1"));
-            pageRepository.save(new Page("3", "Journal 2 Test Page 2", "Page 1 Content", LocalDateTime.now(), "2"));
 
-            pageRepository.findAll().forEach(page -> log.info("Preloaded page with content: " + page.getContent()));
+            int journalsToCreate = 20;
+            for (int i = 1; i <= journalsToCreate; ++i) {
+                String journalId = Integer.toString(i);
+                String journalName = "Test Journal " + i;
+
+                journalRepository.save(new Journal(journalId, journalName, false));
+                pageRepository.save(new Page(Integer.toString(i), journalName + " Test Page 1", "Page 1 Content", LocalDateTime.now(), journalId));
+            }
+            journalRepository.save(new Journal("21", "Test Locked Journal 1", true));
+
+            long journalCnt = journalRepository.count();
+            log.info(String.format("Preloaded %d journals", journalCnt));
+
+            pageRepository.save(new Page(Integer.toString(99), "Journal 1 Test Page 2", "Page 2 Content", LocalDateTime.now(), "1"));
         };
     }
 }

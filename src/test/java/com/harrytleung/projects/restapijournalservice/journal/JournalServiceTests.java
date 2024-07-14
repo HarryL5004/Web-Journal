@@ -8,6 +8,8 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -26,7 +28,7 @@ public class JournalServiceTests {
     @Test
     void testFindAll() {
         BDDMockito.given(repositoryMock.findAll()).willReturn(new ArrayList<>());
-        List<Journal> journals = journalService.findAll();
+        Page<Journal> journals = journalService.findAll(null);
         assertThat(journals).isEmpty();
     }
 

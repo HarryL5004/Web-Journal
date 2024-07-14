@@ -1,11 +1,13 @@
 package com.harrytleung.projects.restapijournalservice.page;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(path="/api/v1/", produces=MediaTypes.HAL_JSON_VALUE)
 public class PageController {
     private final PageService pageService;
@@ -36,10 +37,12 @@ public class PageController {
     }
 
     @GetMapping("/pages")
-    public CollectionModel<EntityModel<Page>> allPages(@RequestParam(value = "title", defaultValue = "") String title) {
+    public ResponseEntity<CollectionModel<EntityModel<Page>>> allPages(@RequestParam(value = "title", defaultValue = "") String title) {
         List<Page> pages = title.isEmpty() ? pageService.findAll() : pageService.findByTitle(title);
 
-        return pageModelAssembler.toCollectionModelForAllPages(pages);
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(pageModelAssembler.toCollectionModelForAllPages(pages));
     }
 
     @GetMapping("/journals/{journalId}/pages/{id}")
@@ -49,6 +52,7 @@ public class PageController {
 
     @PostMapping("/journals/{journalId}/pages")
     public ResponseEntity<?> newPage(@RequestBody Page page) {
+        page.setLastUpdatedTime(LocalDateTime.now());
         EntityModel<Page> entityModel = pageModelAssembler.toModel(pageService.save(page));
 
         return ResponseEntity
@@ -73,10 +77,12 @@ public class PageController {
     }
 
     @GetMapping("/journals/{journalId}/pages")
-    public CollectionModel<EntityModel<Page>> allPagesInJournal(@PathVariable("journalId") String journalId) {
+    public ResponseEntity<CollectionModel<EntityModel<Page>>> allPagesInJournal(@PathVariable("journalId") String journalId) {
         List<Page> pages = pageService.findAllByJournalId(journalId);
 
-        return pageModelAssembler.toCollectionModelForAllPagesInJournal(pages);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(pageModelAssembler.toCollectionModelForAllPagesInJournal(pages));
     }
 
     @DeleteMapping("/journals/{journalId}/pages")

@@ -12,7 +12,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
-import com.harrytleung.projects.restapijournalservice.journal.JournalController;
+import com.harrytleung.projects.restapijournalservice.RootController;
 
 @Component
 public class PageModelAssembler implements RepresentationModelAssembler<Page, EntityModel<Page>>  {
@@ -35,9 +35,12 @@ public class PageModelAssembler implements RepresentationModelAssembler<Page, En
     }
 
     public CollectionModel<EntityModel<Page>> toCollectionModelForAllPagesInJournal(List<Page> pages) {
+        // todo: return list of summarized pages
         return CollectionModel.of(
             StreamSupport.stream(pages.spliterator(), false).map(this::toModel).collect(Collectors.toList()),
-            linkTo(methodOn(PageController.class).allPagesInJournal(null)).withSelfRel()
+            linkTo(methodOn(PageController.class).newPage(null)).withRel("new"),
+            linkTo(methodOn(PageController.class).allPagesInJournal(null)).withSelfRel(),
+            linkTo(methodOn(RootController.class).entry()).withRel("parent")
         );
     }
     
