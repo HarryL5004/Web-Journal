@@ -2,39 +2,62 @@
 
 import halfred from 'halfred';
 import { useEffect, useState } from 'react';
-import { Button, Stack } from '@mui/material';
+import { Button, Pagination, Stack, TablePagination } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 
 import { extractActionLinks, fetchData, getLinkFromTemplate } from '../../lib/utils';
 import JournalCard from './JournalCard';
 import NewJournalCard from './NewJournalCard';
-import { ActionLinkCollection, Journal } from '../../lib/types';
+import { ActionLink, ActionLinkCollection, Journal } from '../../lib/types';
+import UrlTemplate from '@/app/lib/UrlTemplate';
 
 
 type Props = {
-    allJournalUrl: string,
+    allJournalUrl: ActionLink,
     clickOnJournal: (journal: Journal) => void,
 }
 
 const baseCardStyles = {
     minWidth: 200,
+    minHeight: 200,
     maxWidth: 345,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
+    maxHeight: 345
 };
 
 export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) {
     const [journals, setJournals] = useState<Journal[]>([]);
     const [journalActionLinks, setJournalActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
 
-    useEffect(() => {
-        loadAllJournals();
-    }, []);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [count, setCount] = useState(0);
 
-    async function loadAllJournals() {
-        const resp = await fetchData(allJournalUrl);
+    const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, value: number) => {
+        setPage(value);
+    };
+
+    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    useEffect(() => {
+        loadJournals();
+    }, [page, rowsPerPage]);
+
+    async function loadJournals() {
+        let url: string = allJournalUrl.href;
+
+        if (allJournalUrl.templated) {
+            let urlTemplate = new UrlTemplate(allJournalUrl);
+
+            urlTemplate.setValues("page", page.toString());
+            urlTemplate.setValues("size", rowsPerPage.toString());
+            url = urlTemplate.buildUrl();
+        }
+
+        const resp = await fetchData(url);
         if (!resp.ok)
             return;
 
@@ -53,6 +76,9 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
     
         setJournals(journalArr);
         setJournalActionLinks(extractActionLinks(resource));
+
+        if (data.page && data.page.totalElements)
+            setCount(data.page.totalElements);
     };
 
     const addJournal = (journal: Journal) => {
@@ -72,14 +98,17 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
         <Grid container maxWidth="lg" rowSpacing={5}>
             <Grid xs={12}>
                 <Button variant="contained"
-                        onClick={ (e) => {
-                            e.preventDefault();
-                            loadAllJournals();
-                        }}>
-                            <RefreshIcon />
+                            onClick={ (e) => {
+                                e.preventDefault();
+                                loadJournals();
+                            }}>
+                    <RefreshIcon />
                 </Button>
             </Grid>
             <Grid xs={12}>
+                <TablePagination component="div" count={ count } 
+                                page={ page } onPageChange={ handlePageChange }
+                                rowsPerPage={ rowsPerPage } onRowsPerPageChange={ handleRowsPerPageChange } />
                 <Stack spacing={{ xs: 1, sm: 2, md: 4 }} direction="row" useFlexGap flexWrap="wrap">
                     {
                         journalActionLinks.insert.href !== undefined && 

@@ -41,7 +41,7 @@ export default function NewJournalCard({ url, addJournal, styles }: Props) {
 
     return (
         <React.Fragment>
-             <Card sx={ styles }>
+             <Card sx={ styles } variant='outlined'>
                 <CardActionArea onClick={ handleClickOpen }
                                 sx={{ height: "100%", display: "flex", flexDirection: "row" }}>
                     <AddIcon fontSize="large"/>

@@ -34,7 +34,7 @@ export default function Dashboard({ links }: Props) {
             }
             { 
                 activeIndex === 0 &&
-                <JournalViewer allJournalUrl={ getLinkFromTemplate(actionLinks['all-journals'], '') }
+                <JournalViewer allJournalUrl={ actionLinks['all-journals'] }
                     clickOnJournal={ handleClickOnJournal }
                  />
             }

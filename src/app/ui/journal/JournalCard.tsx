@@ -3,7 +3,7 @@
 import CardContent from '@mui/material/CardContent';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
-import { Button, CardActions } from '@mui/material';
+import { Button, CardActions, IconButton, Stack, Typography } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import { deleteData, extractActionLinks, getLinkFromTemplate, putData } from '../../lib/utils';
 import React, { useState } from 'react';
@@ -72,20 +72,27 @@ export default function JournalCard( { journal, openJournal, updateJournal, dele
     return (
         <React.Fragment>
             <Card sx={ styles }>
-                <CardActionArea onClick={ handleClickOnJournal }>
-                    <CardContent>
-                        <h4>{journal.name}</h4>
-                    </CardContent>
-                </CardActionArea>
-                <CardActions>
-                        <Button onClick={ handleLockJournal }>
-                            <LockIcon fontSize='small' color={ journal.locked ? 'primary' : 'action'} />
-                        </Button>
-                        <Button size='small' disabled={ journal.actionLinks.update.href === undefined } 
-                                onClick={ handleEditJournal }>Edit</Button>
-                        <Button size='small' disabled={ journal.actionLinks.delete.href === undefined } 
-                                onClick={ handleDeleteJournal }>Delete</Button>
-                </CardActions>
+                <Stack sx={{ width: '100%', height: '100%' }} display="flex">
+                    <CardActionArea sx={{ height: '80%' }} onClick={ handleClickOnJournal }>
+                        <CardContent sx={{ height: '100%' }}>
+                            <Typography variant='h6' 
+                                        style={{ height: '100%', textAlign: 'center', overflowWrap: 'break-word', textOverflow: 'ellipsis' }}>
+                                {journal.name}
+                            </Typography>
+                        </CardContent>
+                    </CardActionArea>
+                    <CardActions sx={{ height: '20%' }}>
+                            <IconButton onClick={ handleLockJournal } size='small'>
+                                <LockIcon fontSize='small' color={ journal.locked ? 'primary' : 'action'} />
+                            </IconButton>
+                            <Button size='small'
+                                    disabled={ journal.actionLinks.update.href === undefined } 
+                                    onClick={ handleEditJournal }>Edit</Button>
+                            <Button size='small'
+                                    disabled={ journal.actionLinks.delete.href === undefined } 
+                                    onClick={ handleDeleteJournal }>Delete</Button>
+                    </CardActions>
+                </Stack>
             </Card>
             <EditJournalDialog journal={ journal} 
                                 open={ openEditDialog }
