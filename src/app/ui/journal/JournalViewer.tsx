@@ -95,8 +95,8 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
     };
 
     return (
-        <Grid container maxWidth="lg" rowSpacing={5}>
-            <Grid xs={12}>
+        <Grid container maxWidth="inherit" rowSpacing={5}>
+            <Grid xs={2} sx={{ alignContent: "center" }} >
                 <Button variant="contained"
                             onClick={ (e) => {
                                 e.preventDefault();
@@ -105,10 +105,13 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
                     <RefreshIcon />
                 </Button>
             </Grid>
-            <Grid xs={12}>
+            <Grid xs={1}/>
+            <Grid xs={9}>
                 <TablePagination component="div" count={ count } 
                                 page={ page } onPageChange={ handlePageChange }
                                 rowsPerPage={ rowsPerPage } onRowsPerPageChange={ handleRowsPerPageChange } />
+            </Grid>
+            <Grid xs={12}>
                 <Stack spacing={{ xs: 1, sm: 2, md: 4 }} direction="row" useFlexGap flexWrap="wrap">
                     {
                         journalActionLinks.insert.href !== undefined && 

@@ -4,7 +4,7 @@ import React from "react";
 
 export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }> ) {
     return (
-        <Box>
+        <Box sx={{ minWidth: 350 }}>
             <AppBar position="fixed" color="primary">
                 <Toolbar variant="dense">
                     <Link key='Root' href='/'
@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
                     </Link>
                 </Toolbar>
             </AppBar>
-            <Toolbar />
+            <Toolbar sx={{ height: "64px" }} />
             { children }
         </Box>
     );
