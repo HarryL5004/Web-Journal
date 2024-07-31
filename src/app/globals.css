@@ -27,6 +27,10 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.editor-list {
+  padding-inline-start: 1rem;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

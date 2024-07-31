@@ -14,7 +14,7 @@ import UrlTemplate from '@/app/lib/UrlTemplate';
 
 
 type Props = {
-    allJournalUrl: ActionLink,
+    allJournalLink: ActionLink,
     clickOnJournal: (journal: Journal) => void,
 }
 
@@ -25,7 +25,7 @@ const baseCardStyles = {
     maxHeight: 345
 };
 
-export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) {
+export default function JournalViewer({ allJournalLink, clickOnJournal }: Props) {
     const [journals, setJournals] = useState<Journal[]>([]);
     const [journalActionLinks, setJournalActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
 
@@ -47,10 +47,10 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
     }, [page, rowsPerPage]);
 
     async function loadJournals() {
-        let url: string = allJournalUrl.href;
+        let url: string = allJournalLink.href;
 
-        if (allJournalUrl.templated) {
-            let urlTemplate = new UrlTemplate(allJournalUrl);
+        if (allJournalLink.templated) {
+            let urlTemplate = new UrlTemplate(allJournalLink);
 
             urlTemplate.setValues("page", page.toString());
             urlTemplate.setValues("size", rowsPerPage.toString());
@@ -114,7 +114,7 @@ export default function JournalViewer({ allJournalUrl, clickOnJournal }: Props) 
             <Grid xs={12}>
                 <Stack spacing={{ xs: 1, sm: 2, md: 4 }} direction="row" useFlexGap flexWrap="wrap">
                     {
-                        journalActionLinks.insert.href !== undefined && 
+                        journalActionLinks.insert !== undefined && 
                         <NewJournalCard url={ journalActionLinks.insert.href }
                                     addJournal={ addJournal } styles={ baseCardStyles } />
                     }

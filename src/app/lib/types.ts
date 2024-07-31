@@ -1,9 +1,5 @@
 
 export class ActionLinkCollection {
-    insert: ActionLink = {} as ActionLink;
-    update: ActionLink = {} as ActionLink;
-    delete: ActionLink = {} as ActionLink;
-    search: ActionLink = {} as ActionLink;
     [key: string]: ActionLink;
 }
 

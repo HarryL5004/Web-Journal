@@ -86,10 +86,10 @@ export default function JournalCard( { journal, openJournal, updateJournal, dele
                                 <LockIcon fontSize='small' color={ journal.locked ? 'primary' : 'action'} />
                             </IconButton>
                             <Button size='small'
-                                    disabled={ journal.actionLinks.update.href === undefined } 
+                                    disabled={ journal.actionLinks.update === undefined } 
                                     onClick={ handleEditJournal }>Edit</Button>
                             <Button size='small'
-                                    disabled={ journal.actionLinks.delete.href === undefined } 
+                                    disabled={ journal.actionLinks.delete === undefined } 
                                     onClick={ handleDeleteJournal }>Delete</Button>
                     </CardActions>
                 </Stack>

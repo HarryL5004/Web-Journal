@@ -2,27 +2,55 @@
 
 import { Page } from "@/app/lib/types";
 import { deleteData, extractActionLinks, getLinkFromTemplate, patchData, postData, putData } from "@/app/lib/utils";
-import { Button, Container, Paper, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import { MenuButtonAddTable, MenuButtonBold, MenuButtonBulletedList, MenuButtonItalic, MenuButtonOrderedList, MenuButtonUnderline, MenuControlsContainer, MenuDivider, MenuSelectHeading, RichTextEditor, RichTextEditorProvider, RichTextEditorRef, RichTextField } from "mui-tiptap";
+import StarterKit from "@tiptap/starter-kit";
+
 import halfred from 'halfred';
+import { useEditor } from "@tiptap/react";
+import { useEffect } from "react";
+import BulletList from "@tiptap/extension-bullet-list";
+import ListItem from "@tiptap/extension-list-item";
+import OrderedList from "@tiptap/extension-ordered-list";
 
 type Props = {
     page: Page,
+    updatePage: (page: Page) => void,
     deletePage: (pageId: string) => void,
 }
 
-export default function PageEditor({ page, deletePage }: Props) {
+export default function PageEditor({ page, updatePage, deletePage }: Props) {
+    const richTextEditor = useEditor({
+        extensions: [StarterKit,
+                    BulletList.configure({
+                        HTMLAttributes: {
+                            class: 'editor-list'
+                        },
+                    }),
+                    OrderedList.configure({
+                        HTMLAttributes: {
+                            class: 'editor-list'
+                        },
+                    }), 
+                    ListItem],
+        content: page.content,
+        immediatelyRender: true,
+    });
+
+    useEffect(() => {
+        richTextEditor.commands.setContent(page.content);
+    }, [page]);
 
     const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget);
         page.title = formData.get('title') as string;
-        page.content = formData.get('content') as string;
+        page.content = richTextEditor.getHTML();
 
         let isInsert = page.actionLinks.insert !== undefined;
-        if (isInsert && page.actionLinks.update !== undefined) {
-            console.log("Changes cannot be submitted.");
+        if (isInsert && page.actionLinks.update === undefined) {
+            console.log("Changes cannot be submitted."); // todo: notify in popup instead
             return;
         }
 
@@ -36,6 +64,7 @@ export default function PageEditor({ page, deletePage }: Props) {
             page.lastUpdatedTime = resPage.lastUpdatedTime;
             page.content = resPage.content;
             page.actionLinks = extractActionLinks(resource);
+            updatePage(page);
         }
     };
 
@@ -70,7 +99,8 @@ export default function PageEditor({ page, deletePage }: Props) {
 
     return (
         <Paper component='form'
-                sx={{ minWidth: 700 }}
+                elevation={2}
+                sx={{ width: "100%", height: "100%", padding: "10px", display: "flex", flexDirection: 'column' }}
                 onSubmit={ handleOnSubmit }>
             <TextField
                 required
@@ -86,28 +116,30 @@ export default function PageEditor({ page, deletePage }: Props) {
             <Typography textAlign="center" variant="subtitle2">
                 { page.lastUpdatedTime !== undefined && "Last saved: " + new Date(page.lastUpdatedTime).toLocaleString() }
             </Typography>
-            <TextField
-                id="content"
-                name="content"
-                placeholder="Your notes here..."
-                type="text"
-                defaultValue={ page.content }
-                margin="dense"
-                fullWidth
-                minRows={20}
-                maxRows={ Infinity }
-                multiline
-                variant="standard"
-                inputProps={{ maxLength: 1500 }}
-            />
-            <Button type="submit" disabled={ page.actionLinks === undefined || 
-                                    (page.actionLinks.insert === undefined && page.actionLinks.update === undefined) }>
-                Save
-            </Button>
-            <Button disabled={ page.actionLinks === undefined || page.actionLinks.delete === undefined } onClick={ handleDelete }>
-                Delete
-            </Button>
-
+            <RichTextEditorProvider editor={ richTextEditor }>
+                <RichTextField 
+                    controls={
+                        <MenuControlsContainer>
+                            <MenuSelectHeading />
+                            <MenuDivider />
+                            <MenuButtonBold />
+                            <MenuButtonItalic />
+                            <MenuDivider />
+                            <MenuButtonBulletedList />
+                            <MenuButtonOrderedList />
+                        </MenuControlsContainer>
+                    }
+                />
+            </RichTextEditorProvider>
+            <div>
+                <Button type="submit" disabled={ page.actionLinks === undefined || 
+                                        (page.actionLinks.insert === undefined && page.actionLinks.update === undefined) }>
+                    Save
+                </Button>
+                <Button disabled={ page.actionLinks === undefined || page.actionLinks.delete === undefined } onClick={ handleDelete }>
+                    Delete
+                </Button>
+            </div>
         </Paper>
     );
 }
