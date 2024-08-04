@@ -2,16 +2,14 @@
 
 import { Page } from "@/app/lib/types";
 import { deleteData, extractActionLinks, getLinkFromTemplate, patchData, postData, putData } from "@/app/lib/utils";
-import { Box, Button, Container, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
 import { MenuButtonAddTable, MenuButtonBold, MenuButtonBulletedList, MenuButtonItalic, MenuButtonOrderedList, MenuButtonUnderline, MenuControlsContainer, MenuDivider, MenuSelectHeading, RichTextEditor, RichTextEditorProvider, RichTextEditorRef, RichTextField } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 
 import halfred from 'halfred';
 import { useEditor } from "@tiptap/react";
 import { useEffect } from "react";
-import BulletList from "@tiptap/extension-bullet-list";
-import ListItem from "@tiptap/extension-list-item";
-import OrderedList from "@tiptap/extension-ordered-list";
+import Placeholder from "@tiptap/extension-placeholder";
 
 type Props = {
     page: Page,
@@ -21,19 +19,22 @@ type Props = {
 
 export default function PageEditor({ page, updatePage, deletePage }: Props) {
     const richTextEditor = useEditor({
-        extensions: [StarterKit,
-                    BulletList.configure({
-                        HTMLAttributes: {
-                            class: 'editor-list'
+        extensions: [StarterKit.configure({
+                        bulletList: {
+                            HTMLAttributes: {
+                                class: 'editor-list',
+                            },
                         },
+                        orderedList: {
+                            HTMLAttributes: {
+                                class: 'editor-list',
+                            },
+                        }
                     }),
-                    OrderedList.configure({
-                        HTMLAttributes: {
-                            class: 'editor-list'
-                        },
-                    }), 
-                    ListItem],
-        content: page.content,
+                    Placeholder.configure({
+                        placeholder: "Your notes here...",
+                    })],
+        content: page?.content,
         immediatelyRender: true,
     });
 
@@ -129,17 +130,19 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
                             <MenuButtonOrderedList />
                         </MenuControlsContainer>
                     }
+                    footer={
+                        <Stack direction="row" spacing={2} sx={{ }}>
+                            <Button type="submit" disabled={ page.actionLinks === undefined || 
+                                                    (page.actionLinks.insert === undefined && page.actionLinks.update === undefined) }>
+                                Save
+                            </Button>
+                            <Button disabled={ page.actionLinks === undefined || page.actionLinks.delete === undefined } onClick={ handleDelete }>
+                                Delete
+                            </Button>
+                        </Stack>
+                    }
                 />
             </RichTextEditorProvider>
-            <div>
-                <Button type="submit" disabled={ page.actionLinks === undefined || 
-                                        (page.actionLinks.insert === undefined && page.actionLinks.update === undefined) }>
-                    Save
-                </Button>
-                <Button disabled={ page.actionLinks === undefined || page.actionLinks.delete === undefined } onClick={ handleDelete }>
-                    Delete
-                </Button>
-            </div>
         </Paper>
     );
 }

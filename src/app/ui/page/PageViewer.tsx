@@ -8,7 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useEffect, useState } from "react";
 import PageEditor from "./PageEditor";
-import { extractActionLinks, fetchData } from "@/app/lib/utils";
+import { extractActionLinks, fetchData, getLinkFromTemplate, postData } from "@/app/lib/utils";
 import halfred from "halfred";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { TransitionProps } from '@mui/material/transitions';
@@ -30,7 +30,7 @@ const Transition = React.forwardRef(function Transition(
 });
 
 export default function PageViewer({ journal, backToJournal }: Prop) {
-    const [currPage, setCurrPage] = useState<Page>({} as Page);
+    const [currPage, setCurrPage] = useState<Page | null>(null);
     const [pages, setPages] = useState<Page[]>([]);
     const [pageColActionLinks, setPageColActionLinks] = useState<ActionLinkCollection>(new ActionLinkCollection());
 
@@ -60,13 +60,8 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
         setPages(pageArr);
         setPageColActionLinks(extractActionLinks(resource));
-        if (pageArr.length > 0) {
-            setCurrPage(pageArr[0]);
-            setSelectedIndex(1);
-        } else {
-            setCurrPage({} as Page);
-            setSelectedIndex(0);
-        }
+        setCurrPage(pageArr.length > 0 ? pageArr[0] : null);
+        setSelectedIndex(0);
     };
 
     const updatePage = (page: Page) => {
@@ -83,19 +78,33 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
     const deletePage = (pageId: string) => {
         const remainingPages = pages.filter(p => p.id != pageId);
         setPages(remainingPages);
+        if (remainingPages.length === 0) {
+            changePage(0, null);
+            return;
+        }
+
+        let newPageIndex = selectedIndex >= remainingPages.length ? selectedIndex -  1 : selectedIndex;
+        changePage(newPageIndex, remainingPages[newPageIndex]);
     };
 
     const handlePageChange = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
         event.preventDefault();
 
-        setSelectedIndex(index + 1);
-        setCurrPage(pages[index]);
-
+        changePage(index, pages[index]);
         if (openDialog)
             setOpenDialog(false);
     }
 
-    const handleCreateNewPage = () => {
+    const changePage = (index: number, page: Page | null) => {
+        if (index < 0) {
+            console.log("Invalid index: ", index);
+            return;
+        }
+        setSelectedIndex(index);
+        setCurrPage(page);
+    }
+
+    const handleCreateNewPage = async () => {
         let newPage = {
             title: "New Page",
             journalId: journal.id,
@@ -104,8 +113,20 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                 delete: {} as ActionLink,
             } as ActionLinkCollection
         } as Page;
-        setPages([newPage, ...pages]);
-        setCurrPage(newPage);
+
+        let submitUrl = pageColActionLinks.insert.templated ? 
+            getLinkFromTemplate(pageColActionLinks.insert, journal.id) : pageColActionLinks.insert.href;
+        const res = await postData(submitUrl, JSON.stringify(newPage));
+        if (res.ok) {
+            const resource = halfred.parse(await res.json());
+            const resPage = resource.original() as Page;
+            resPage.actionLinks = extractActionLinks(resource);
+
+            const newPages = [...pages, resPage];
+            setPages(newPages);
+            setCurrPage(resPage);
+            setSelectedIndex(newPages.length - 1);
+        }
 
         if (openDialog)
             setOpenDialog(false);
@@ -125,7 +146,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                 {
                     pages.map( (page, index) => (
                         <div key={ index }>
-                            <ListItemButton selected={ selectedIndex === index + 1 }
+                            <ListItemButton selected={ selectedIndex === index }
                                     onClick={ event => handlePageChange(event, index) }>
                                 <ListItemText primary={ page.title } sx={{ textOverflow: 'ellipsis' }} />
                             </ListItemButton>
@@ -185,9 +206,12 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                     { pageList }
                 </Box>
             </Box>
-            <Box minWidth={250} flexGrow={1}>
-                <PageEditor page={ currPage } updatePage={ updatePage } deletePage={ deletePage }/>
-            </Box>
+            {
+                currPage !== null &&
+                <Box minWidth={250} flexGrow={1}>
+                    <PageEditor page={ currPage } updatePage={ updatePage } deletePage={ deletePage }/>
+                </Box>
+            }
             { dialog }
         </Box>
     );
