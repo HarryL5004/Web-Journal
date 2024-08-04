@@ -3,7 +3,7 @@
 import { Page } from "@/app/lib/types";
 import { deleteData, extractActionLinks, getLinkFromTemplate, patchData, postData, putData } from "@/app/lib/utils";
 import { Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
-import { MenuButtonAddTable, MenuButtonBold, MenuButtonBulletedList, MenuButtonItalic, MenuButtonOrderedList, MenuButtonUnderline, MenuControlsContainer, MenuDivider, MenuSelectHeading, RichTextEditor, RichTextEditorProvider, RichTextEditorRef, RichTextField } from "mui-tiptap";
+import { MenuButtonBold, MenuButtonBulletedList, MenuButtonCode, MenuButtonItalic, MenuButtonOrderedList, MenuButtonStrikethrough, MenuControlsContainer, MenuDivider, MenuSelectHeading, RichTextEditorProvider, RichTextField } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 
 import halfred from 'halfred';
@@ -39,6 +39,9 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
     });
 
     useEffect(() => {
+        if (!richTextEditor || richTextEditor.isDestroyed)
+            return;
+
         richTextEditor.commands.setContent(page.content);
     }, [page]);
 
@@ -125,9 +128,12 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
                             <MenuDivider />
                             <MenuButtonBold />
                             <MenuButtonItalic />
+                            <MenuButtonCode />
+                            <MenuButtonStrikethrough />
                             <MenuDivider />
                             <MenuButtonBulletedList />
                             <MenuButtonOrderedList />
+                            <MenuDivider />
                         </MenuControlsContainer>
                     }
                     footer={

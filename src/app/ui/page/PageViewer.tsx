@@ -1,7 +1,7 @@
 'use client';
 
 import { ActionLink, ActionLinkCollection, Journal, Page } from "@/app/lib/types";
-import { AppBar, Box, Button, Card, CardActions, CardContent, Container, Dialog, Divider, Drawer, IconButton, List, ListItemButton, ListItemText, Slide, Stack, SwipeableDrawer, TextField, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Card, CardActions, CardContent, Container, Dialog, Divider, Drawer, IconButton, List, ListItemButton, ListItemText, Slide, SnackbarCloseReason, Stack, SwipeableDrawer, TextField, Toolbar, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -12,6 +12,7 @@ import { extractActionLinks, fetchData, getLinkFromTemplate, postData } from "@/
 import halfred from "halfred";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { TransitionProps } from '@mui/material/transitions';
+import MySnackbar from "../MySnackbar";
 
 type Prop = {
     journal: Journal
@@ -36,6 +37,9 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
+
+    const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
+    const [snackbarMsg, setSnackbarMsg] = useState("");
 
     useEffect(() => {
         loadPages(journal.actionLinks.pages.href)
@@ -73,6 +77,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
         pages[index] = page;
         setPages([...pages]);
+        openSnackbar("Updated page");
     };
 
     const deletePage = (pageId: string) => {
@@ -85,6 +90,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
         let newPageIndex = selectedIndex >= remainingPages.length ? selectedIndex -  1 : selectedIndex;
         changePage(newPageIndex, remainingPages[newPageIndex]);
+        openSnackbar("Deleted page");
     };
 
     const handlePageChange = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
@@ -130,6 +136,8 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
         if (openDialog)
             setOpenDialog(false);
+
+        openSnackbar("Created page");
     };
 
     const handleDialogOpen = () => {
@@ -138,6 +146,18 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
 
     const handleDialogClose = () => {
         setOpenDialog(false);
+    };
+
+    const openSnackbar = (msg: string) => {
+        setSnackbarMsg(msg);
+        setIsOpenSnackbar(true);
+    };
+
+    const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+        if (reason === 'clickaway')
+            return;
+
+        setIsOpenSnackbar(false);
     };
 
     const pageList = (
@@ -213,6 +233,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                 </Box>
             }
             { dialog }
+            <MySnackbar open={ isOpenSnackbar } autoHideDuration={ 4000 } message={ snackbarMsg } onClose={ handleCloseSnackbar } />
         </Box>
     );
 }

@@ -56,6 +56,7 @@ export default function JournalCard( { journal, openJournal, updateJournal, dele
 
     const handleCloseEditDialog = () => {
         setOpenEditDialog(false);
+        updateJournal(journal);
     }
 
     const handleDeleteJournal = async (e: React.MouseEvent<HTMLElement>) => {
