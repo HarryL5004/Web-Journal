@@ -13,6 +13,7 @@ import halfred from "halfred";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { TransitionProps } from '@mui/material/transitions';
 import MySnackbar from "../MySnackbar";
+import { LinkBubbleMenu } from "mui-tiptap";
 
 type Prop = {
     journal: Journal
@@ -184,11 +185,11 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                 onClick={ backToJournal }>
                 <ArrowBackIcon />
             </IconButton>
-            <Button variant="outlined" sx={{ display: { xs: 'none', sm: 'inline-flex'}, flex: 1, marginRight: '10px' }}
+            <Button aria-labelledby="New page" variant="outlined" sx={{ display: { xs: 'none', sm: 'inline-flex'}, flex: 1, marginRight: '10px' }}
                     onClick={ handleCreateNewPage } startIcon={ <AddIcon /> }>
                 New Page
             </Button>
-            <Button variant="outlined" sx={{ flex: 1, display: { xs: 'inline', sm: 'none'} }}
+            <Button aria-labelledby="All pages" variant="outlined" sx={{ flex: 1, display: { xs: 'inline', sm: 'none' } }}
                     onClick={ handleDialogOpen }>
                 All pages
             </Button>
@@ -219,7 +220,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
     );
 // maxHeight: 'calc(100vh - 56px)'
     return (
-        <Box height="calc(100vh - 64px - 10px)" sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row'}, flexWrap: 'wrap', rowGap: '10px' }}>
+        <Box height="calc(100vh - 64px - 10px)" sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row'}, flexWrap: 'nowrap', rowGap: '10px' }}>
             <Box flexGrow={0} sx={{ width: { xs: '100%', sm: drawerWidth }, flexShrink: { sm: 0 } }}>
                 { viewerButtons }
                 <Box sx={{ width: { xs: '100%' }, height: 'fit-content', display: { xs: 'none', sm: 'block' } }}>
@@ -229,7 +230,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
             {
                 currPage !== null &&
                 <Box minWidth={250} flexGrow={1}>
-                    <PageEditor page={ currPage } updatePage={ updatePage } deletePage={ deletePage }/>
+                    <PageEditor page={ currPage } updatePage={ updatePage } deletePage={ deletePage } />
                 </Box>
             }
             { dialog }

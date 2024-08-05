@@ -31,6 +31,20 @@ body {
   padding-inline-start: 1rem;
 }
 
+.MuiTiptap-FieldContainer-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.MuiTiptap-RichTextContent-root {
+  flex-grow: 1;
+
+  & .ProseMirror {
+    height: 100%;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

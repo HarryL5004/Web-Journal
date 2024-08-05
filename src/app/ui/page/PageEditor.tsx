@@ -2,14 +2,16 @@
 
 import { Page } from "@/app/lib/types";
 import { deleteData, extractActionLinks, getLinkFromTemplate, patchData, postData, putData } from "@/app/lib/utils";
-import { Box, Button, Container, Paper, Stack, TextField, Typography } from "@mui/material";
-import { MenuButtonBold, MenuButtonBulletedList, MenuButtonCode, MenuButtonItalic, MenuButtonOrderedList, MenuButtonStrikethrough, MenuControlsContainer, MenuDivider, MenuSelectHeading, RichTextEditorProvider, RichTextField } from "mui-tiptap";
+import { Box, Button, Container, Divider, Paper, Stack, TextField, Typography } from "@mui/material";
+import { LinkBubbleMenu, LinkBubbleMenuHandler, MenuButtonBold, MenuButtonBulletedList, MenuButtonCode, MenuButtonEditLink, MenuButtonItalic, MenuButtonOrderedList, MenuButtonStrikethrough, MenuControlsContainer, MenuDivider, MenuSelectHeading, MenuSelectTextAlign, RichTextEditorProvider, RichTextField } from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 
 import halfred from 'halfred';
 import { useEditor } from "@tiptap/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Placeholder from "@tiptap/extension-placeholder";
+import Link from "@tiptap/extension-link";
+import TextAlign from "@tiptap/extension-text-align";
 
 type Props = {
     page: Page,
@@ -18,6 +20,8 @@ type Props = {
 }
 
 export default function PageEditor({ page, updatePage, deletePage }: Props) {
+    const [pageTitle, setPageTitle] = useState("");
+
     const richTextEditor = useEditor({
         extensions: [StarterKit.configure({
                         bulletList: {
@@ -33,6 +37,11 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
                     }),
                     Placeholder.configure({
                         placeholder: "Your notes here...",
+                    }),
+                    Link,
+                    LinkBubbleMenuHandler,
+                    TextAlign.configure({
+                        types: ['heading', 'paragraph'],
                     })],
         content: page?.content,
         immediatelyRender: true,
@@ -42,6 +51,7 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
         if (!richTextEditor || richTextEditor.isDestroyed)
             return;
 
+        setPageTitle(page.title);
         richTextEditor.commands.setContent(page.content);
     }, [page]);
 
@@ -114,7 +124,10 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
                 placeholder="Title"
                 type="text"
                 fullWidth
-                defaultValue={ page.title }
+                value={ pageTitle }
+                onChange={ (event: React.ChangeEvent<HTMLInputElement>) => {
+                    setPageTitle(event.target.value);
+                }}
                 variant="standard"
             />
             <Typography textAlign="center" variant="subtitle2">
@@ -126,28 +139,40 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
                         <MenuControlsContainer>
                             <MenuSelectHeading />
                             <MenuDivider />
+
                             <MenuButtonBold />
                             <MenuButtonItalic />
                             <MenuButtonCode />
                             <MenuButtonStrikethrough />
                             <MenuDivider />
+
                             <MenuButtonBulletedList />
                             <MenuButtonOrderedList />
                             <MenuDivider />
+
+                            <MenuButtonEditLink />
+                            <MenuDivider />
+
+                            <MenuSelectTextAlign />
                         </MenuControlsContainer>
                     }
                     footer={
-                        <Stack direction="row" spacing={2} sx={{ }}>
-                            <Button type="submit" disabled={ page.actionLinks === undefined || 
-                                                    (page.actionLinks.insert === undefined && page.actionLinks.update === undefined) }>
-                                Save
-                            </Button>
-                            <Button disabled={ page.actionLinks === undefined || page.actionLinks.delete === undefined } onClick={ handleDelete }>
-                                Delete
-                            </Button>
-                        </Stack>
+                        <>
+                            <Divider />
+                            <Stack direction="row" spacing={2} sx={{ }}>
+                                <Button type="submit" disabled={ page.actionLinks === undefined || 
+                                                        (page.actionLinks.insert === undefined && page.actionLinks.update === undefined) }>
+                                    Save
+                                </Button>
+                                <Button disabled={ page.actionLinks === undefined || page.actionLinks.delete === undefined } onClick={ handleDelete }>
+                                    Delete
+                                </Button>
+                            </Stack>
+                        </>
                     }
                 />
+
+                <LinkBubbleMenu />
             </RichTextEditorProvider>
         </Paper>
     );
