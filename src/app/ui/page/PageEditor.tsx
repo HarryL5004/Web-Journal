@@ -15,11 +15,12 @@ import TextAlign from "@tiptap/extension-text-align";
 
 type Props = {
     page: Page,
+    editable: boolean,
     updatePage: (page: Page) => void,
     deletePage: (pageId: string) => void,
 }
 
-export default function PageEditor({ page, updatePage, deletePage }: Props) {
+export default function PageEditor({ page, editable, updatePage, deletePage }: Props) {
     const [pageTitle, setPageTitle] = useState("");
 
     const richTextEditor = useEditor({
@@ -53,6 +54,7 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
 
         setPageTitle(page.title);
         richTextEditor.commands.setContent(page.content);
+        richTextEditor.setEditable(editable);
     }, [page]);
 
     const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -128,6 +130,7 @@ export default function PageEditor({ page, updatePage, deletePage }: Props) {
                 onChange={ (event: React.ChangeEvent<HTMLInputElement>) => {
                     setPageTitle(event.target.value);
                 }}
+                disabled={ !editable }
                 variant="standard"
             />
             <Typography textAlign="center" variant="subtitle2">

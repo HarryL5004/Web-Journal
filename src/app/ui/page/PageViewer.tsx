@@ -183,7 +183,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                 <ArrowBackIcon />
             </IconButton>
             <Button aria-labelledby="New page" variant="outlined" sx={{ display: { xs: 'none', sm: 'inline-flex'}, flex: 1, marginRight: '10px' }}
-                    onClick={ handleCreateNewPage } startIcon={ <AddIcon /> }>
+                    onClick={ handleCreateNewPage } disabled={ journal.locked } startIcon={ <AddIcon /> }>
                 New Page
             </Button>
             <Button aria-labelledby="All pages" variant="outlined" sx={{ flex: 1, display: { xs: 'inline', sm: 'none' } }}
@@ -227,7 +227,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
             {
                 currPage !== null &&
                 <Box minWidth={250} flexGrow={1}>
-                    <PageEditor page={ currPage } updatePage={ updatePage } deletePage={ deletePage } />
+                    <PageEditor page={ currPage } editable={ !journal.locked } updatePage={ updatePage } deletePage={ deletePage } />
                 </Box>
             }
             { dialog }
