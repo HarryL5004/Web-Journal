@@ -6,7 +6,7 @@ import { Button, Pagination, SnackbarCloseReason, Stack, TablePagination } from 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 
-import { extractActionLinks, fetchData, getLinkFromTemplate } from '../../lib/utils';
+import { extractActionLinks } from '../../lib/utils';
 import JournalCard from './JournalCard';
 import NewJournalCard from './NewJournalCard';
 import { ActionLink, ActionLinkCollection, Journal } from '../../lib/types';
@@ -61,7 +61,7 @@ export default function JournalViewer({ allJournalLink, clickOnJournal }: Props)
             url = urlTemplate.buildUrl();
         }
 
-        const resp = await fetchData(url);
+        const resp = await fetch(url);
         if (!resp.ok)
             return;
 

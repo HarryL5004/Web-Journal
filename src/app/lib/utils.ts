@@ -1,10 +1,6 @@
 import halfred from 'halfred';
 import { ActionLinkCollection, ActionLink } from './types';
 
-export async function fetchData(url: string): Promise<Response> {
-    return await fetch(url, { cache: 'force-cache'} );
-}
-
 export async function postData(url: string, data: any): Promise<Response> {
     return await fetch(url, {
         method: 'POST',

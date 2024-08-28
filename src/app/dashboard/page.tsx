@@ -13,12 +13,24 @@ export default async function Dashboard() {
 }
 
 async function getRootLinks(): Promise<ActionLinkCollection> {
-    const resp = await fetch('http://localhost:8080/api', { cache: 'force-cache' });
-    let data = await resp.json();
-            
-    let journalData: halfred.Resource = halfred.parse(data);
-    if (journalData == undefined)
-        return {} as ActionLinkCollection;
+    const API_URL = process.env.API_URL;
+    let actionLinkCol = {} as ActionLinkCollection;
 
-    return extractActionLinks(journalData);
+    if (!API_URL)
+        return actionLinkCol;
+
+    try {
+        const resp = await fetch(API_URL);
+        if (!resp.ok)
+            throw new Error(`Request failed with status: ${resp.status}`);
+
+        const data = await resp.json();
+        const journalData = halfred.parse(data);
+        actionLinkCol = extractActionLinks(journalData);
+    } catch (error) {
+        if (error instanceof Error)
+            console.log("Error: ", error);
+    }
+
+    return actionLinkCol;
 }

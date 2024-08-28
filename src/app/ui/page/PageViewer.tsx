@@ -4,16 +4,13 @@ import { ActionLink, ActionLinkCollection, Journal, Page } from "@/app/lib/types
 import { AppBar, Box, Button, Card, CardActions, CardContent, Container, Dialog, Divider, Drawer, IconButton, List, ListItemButton, ListItemText, Slide, SnackbarCloseReason, Stack, SwipeableDrawer, TextField, Toolbar, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
-import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useEffect, useState } from "react";
 import PageEditor from "./PageEditor";
-import { extractActionLinks, fetchData, getLinkFromTemplate, postData } from "@/app/lib/utils";
+import { extractActionLinks, getLinkFromTemplate, postData } from "@/app/lib/utils";
 import halfred from "halfred";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { TransitionProps } from '@mui/material/transitions';
 import MySnackbar from "../MySnackbar";
-import { LinkBubbleMenu } from "mui-tiptap";
 
 type Prop = {
     journal: Journal
@@ -47,7 +44,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
     }, []);
 
     async function loadPages(url: string) {
-        const resp = await fetchData(url);
+        const resp = await fetch(url);
         if (!resp.ok)
             return;
 

@@ -5,12 +5,15 @@ import { IconButton } from '@mui/material';
 
 type Props = {
     open: boolean,
-    autoHideDuration: number,
+    autoHideDuration?: number,
     message: string,
     onClose: (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => void,
 }
 
-export default function MySnackbar( { open, autoHideDuration, message, onClose }: Props ) {
+const DEFAULT_AUTO_HIDE_DURATION = 4000; // ms
+
+export default function MySnackbar( { open, autoHideDuration = DEFAULT_AUTO_HIDE_DURATION, 
+                                        message, onClose }: Props ) {
     const action = (
         <IconButton
             size='small'
