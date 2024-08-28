@@ -82,7 +82,7 @@ public class PageController {
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
-                .body(pageModelAssembler.toCollectionModelForAllPagesInJournal(pages));
+                .body(pageModelAssembler.toCollectionModelForAllPagesInJournal(journalId, pages));
     }
 
     @DeleteMapping("/journals/{journalId}/pages")

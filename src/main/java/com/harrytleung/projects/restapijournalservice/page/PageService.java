@@ -14,6 +14,10 @@ public class PageService {
         this.pageRepository = pageRepository;
     }
 
+    public void deleteAllByJournalId(String journalId) {
+        pageRepository.deleteAllByJournalId(journalId);
+    }
+
     List<Page> findAll() {
         return pageRepository.findAll();
     }
@@ -52,9 +56,5 @@ public class PageService {
 
     void deleteById(String id) {
         pageRepository.deleteById(id);
-    }
-
-    void deleteAllByJournalId(String journalId) {
-        pageRepository.deleteAllByJournalId(journalId);
     }
 }

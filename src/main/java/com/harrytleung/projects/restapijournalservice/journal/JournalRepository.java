@@ -7,4 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface JournalRepository extends MongoRepository<Journal, String> {
     // @Query("{name:'?0'}")
     Page<Journal> findJournalsByNameLike(String name, Pageable pageable);
+
+    boolean existsByLockedIsTrueAndIdIs(String id);
 }

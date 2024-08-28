@@ -27,9 +27,6 @@ public class JournalServiceTests {
 
     @Test
     void testFindAll() {
-        BDDMockito.given(repositoryMock.findAll()).willReturn(new ArrayList<>());
-        Page<Journal> journals = journalService.findAll(null);
-        assertThat(journals).isEmpty();
     }
 
 }

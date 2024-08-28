@@ -15,16 +15,20 @@ public class JournalService {
         this.journalRepository = journalRepository;
     }
 
+    public boolean isJournalLocked(String id) {
+        return journalRepository.existsByLockedIsTrueAndIdIs(id);
+    }
+
     Page<Journal> findAll(Pageable pageable) {
         return journalRepository.findAll(pageable);
     }
 
-    Optional<Journal> findById(String id) {
-        return journalRepository.findById(id);
-    }
-
     Page<Journal> findByname(String name, Pageable pageable) {
         return journalRepository.findJournalsByNameLike(name, pageable);
+    }
+
+    Optional<Journal> findById(String id) {
+        return journalRepository.findById(id);
     }
 
     Journal save(Journal journal) {

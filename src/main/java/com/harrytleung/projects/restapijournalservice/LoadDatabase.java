@@ -34,11 +34,12 @@ public class LoadDatabase {
                 pageRepository.save(new Page(Integer.toString(i), journalName + " Test Page 1", "Page 1 Content", LocalDateTime.now(), journalId));
             }
             journalRepository.save(new Journal("21", "Test Locked Journal 1", true));
+            pageRepository.save(new Page(Integer.toString(99), "Locked Journal Test Page", "Locked journal page", LocalDateTime.now(), "21"));
 
             long journalCnt = journalRepository.count();
             log.info(String.format("Preloaded %d journals", journalCnt));
 
-            pageRepository.save(new Page(Integer.toString(99), "Journal 1 Test Page 2", "Page 2 Content", LocalDateTime.now(), "1"));
+            pageRepository.save(new Page(Integer.toString(999), "Journal 1 Test Page 2", "Page 2 Content", LocalDateTime.now(), "1"));
         };
     }
 }

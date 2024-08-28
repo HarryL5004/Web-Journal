@@ -22,20 +22,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.harrytleung.projects.restapijournalservice.page.PageService;
+
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 
 @RestController
 @RequestMapping(path="/api/v1/journals", produces=MediaTypes.HAL_JSON_VALUE)
 public class JournalController {
     private final JournalService journalService;
+    private final PageService pageService;
     private final JournalModelAssembler journalModelAssembler;
     private final PagedResourcesAssembler<Journal> pagedResourcesAssembler;
 
-    JournalController(JournalService journalService, JournalModelAssembler assembler, PagedResourcesAssembler<Journal> pagedResourcesAssembler) {
+    JournalController(JournalService journalService, PageService pageService, 
+                        JournalModelAssembler assembler, PagedResourcesAssembler<Journal> pagedResourcesAssembler) {
         this.journalService = journalService;
+        this.pageService = pageService;
         this.journalModelAssembler = assembler;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
@@ -45,7 +48,7 @@ public class JournalController {
         Journal journal = journalService.findById(id).orElseThrow(() -> new JournalNotFoundException(id));
 
         return ResponseEntity.ok()
-            .cacheControl(CacheControl.maxAge(1, TimeUnit.SECONDS))
+            .cacheControl(CacheControl.noStore())
             .body(journalModelAssembler.toModel(journal));
     }
 
@@ -53,7 +56,7 @@ public class JournalController {
     public ResponseEntity<PagedModel<EntityModel<Journal>>> allJournals(@RequestParam("name") Optional<String> optionalName,
                                                                         @RequestParam("page") Optional<Integer> page,
                                                                         @RequestParam("size") Optional<Integer> size,
-                                                                        @PageableDefault(value = 8) Pageable pageable) {
+                                                                        @PageableDefault(value = 10) Pageable pageable) {
         Page<Journal> journals = optionalName.isPresent() && optionalName.get() != null ? 
             journalService.findByname(optionalName.get(), pageable) :
             journalService.findAll(pageable);
@@ -61,7 +64,7 @@ public class JournalController {
 
         return ResponseEntity
             .ok()
-            .cacheControl(CacheControl.maxAge(1, TimeUnit.SECONDS))
+            .cacheControl(CacheControl.noStore())
             .body(journalModelAssembler.addAdditionalRelLinks(pagedResourcesAssembler.toModel(journals, journalModelAssembler)));
     }
 
@@ -97,7 +100,7 @@ public class JournalController {
     
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteJournal(@PathVariable("id") String id) {
-        // TODO: delete pages associated with journal
+        pageService.deleteAllByJournalId(id);
         journalService.deleteById(id);
         return ResponseEntity.noContent()
             .cacheControl(CacheControl.noStore())
