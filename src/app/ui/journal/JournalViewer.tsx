@@ -150,7 +150,7 @@ export default function JournalViewer({ allJournalLink, clickOnJournal }: Props)
                     </Stack>
                 </Grid>
             </Grid>
-            <MySnackbar open={ isOpenSnackbar } autoHideDuration={ 4000 } message={ snackbarMsg } onClose={ handleCloseSnackbar } />
+            <MySnackbar open={ isOpenSnackbar } message={ snackbarMsg } onClose={ handleCloseSnackbar } />
         </>
     )
 }

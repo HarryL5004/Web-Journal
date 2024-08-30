@@ -9,14 +9,14 @@ import { Journal } from "../../lib/types";
 type Props = {
     journal: Journal,
     open: boolean,
-    onClose: () => void,
+    onClose: (submitted: boolean) => void,
 }
 
 export default function EditJournalDialog({ journal, open, onClose }: Props) {
     const [journalName, setJournalName] = useState(journal.name);
 
-    const handleClose = () => {
-        onClose();
+    const handleClose = (submitted: boolean = false) => {
+        onClose(submitted);
         setJournalName(journal.name);
     }
 
@@ -40,12 +40,12 @@ export default function EditJournalDialog({ journal, open, onClose }: Props) {
             journal.locked = resJournal.locked;
             journal.actionLinks = extractActionLinks(resource);
 
-            handleClose();
+            handleClose(true);
         }
     };
 
     return (
-        <Dialog open={ open } onClose={ handleClose }
+        <Dialog open={ open } onClose={ () => handleClose() }
                 disableRestoreFocus={ true }
                 PaperProps={{
                     component: 'form',
@@ -70,7 +70,7 @@ export default function EditJournalDialog({ journal, open, onClose }: Props) {
                 </TextField>
             </DialogContent>
             <DialogActions>
-                <Button onClick={ handleClose }>Cancel</Button>
+                <Button onClick={ () => handleClose() }>Cancel</Button>
                 <Button type="submit">Update</Button>
             </DialogActions>
         </Dialog>
