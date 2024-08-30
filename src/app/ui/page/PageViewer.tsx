@@ -227,11 +227,12 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
             {
                 currPage !== null &&
                 <Box minWidth={250} flexGrow={1}>
-                    <PageEditor page={ currPage } editable={ !journal.locked } updatePage={ updatePage } deletePage={ deletePage } />
+                    <PageEditor page={ currPage } editable={ !journal.locked } showErrMsg={ openSnackbar }
+                            updatePage={ updatePage } deletePage={ deletePage } />
                 </Box>
             }
             { dialog }
-            <MySnackbar open={ isOpenSnackbar } autoHideDuration={ 4000 } message={ snackbarMsg } onClose={ handleCloseSnackbar } />
+            <MySnackbar open={ isOpenSnackbar } message={ snackbarMsg } onClose={ handleCloseSnackbar } />
         </Box>
     );
 }

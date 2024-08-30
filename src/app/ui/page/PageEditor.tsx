@@ -18,9 +18,10 @@ type Props = {
     editable: boolean,
     updatePage: (page: Page) => void,
     deletePage: (pageId: string) => void,
+    showErrMsg: (msg: string) => void,
 }
 
-export default function PageEditor({ page, editable, updatePage, deletePage }: Props) {
+export default function PageEditor({ page, editable, updatePage, deletePage, showErrMsg }: Props) {
     const [pageTitle, setPageTitle] = useState("");
 
     const richTextEditor = useEditor({
@@ -66,7 +67,7 @@ export default function PageEditor({ page, editable, updatePage, deletePage }: P
 
         let isInsert = page.actionLinks.insert !== undefined;
         if (isInsert && page.actionLinks.update === undefined) {
-            console.log("Changes cannot be submitted."); // todo: notify in popup instead
+            showErrMsg("Failed to submit changes.");
             return;
         }
 
