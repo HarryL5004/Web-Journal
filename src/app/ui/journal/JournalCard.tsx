@@ -5,8 +5,9 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import { Button, CardActions, IconButton, Stack, Typography } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { deleteData, extractActionLinks, getLinkFromTemplate, putData } from '../../lib/utils';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import EditJournalDialog from './EditJournalDialog';
 import { Journal } from '../../lib/types';
 import halfred from 'halfred';
@@ -21,6 +22,11 @@ type Prop = {
 
 export default function JournalCard( { journal, openJournal, updateJournal, deleteJournal, styles }: Prop ) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [isLocked, setIsLocked] = useState(true);
+
+    useEffect(() => {
+        setIsLocked(journal.locked);
+    }, []);
 
     const handleClickOnJournal = async(e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault();
@@ -33,8 +39,8 @@ export default function JournalCard( { journal, openJournal, updateJournal, dele
 
         journal.locked = !journal.locked;
 
-        let updateActionLink = journal.actionLinks.update.href !== undefined ? 
-        journal.actionLinks.update : journal.actionLinks.self;
+        let updateActionLink = journal.actionLinks.update.href !== undefined ? journal.actionLinks.update : 
+            journal.actionLinks.self;
         let updateLink = updateActionLink.templated ? getLinkFromTemplate(updateActionLink, '') :
             updateActionLink.href;
 
@@ -46,6 +52,7 @@ export default function JournalCard( { journal, openJournal, updateJournal, dele
             journal.name = resJournal.name;
             journal.locked = resJournal.locked;
             journal.actionLinks = extractActionLinks(resource);
+            setIsLocked(journal.locked);
             updateJournal(journal);
         }
     };
@@ -84,7 +91,14 @@ export default function JournalCard( { journal, openJournal, updateJournal, dele
                     </CardActionArea>
                     <CardActions sx={{ height: '20%' }}>
                             <IconButton onClick={ handleLockJournal } size='small'>
-                                <LockIcon fontSize='small' color={ journal.locked ? 'primary' : 'action'} />
+                                {
+                                    isLocked &&
+                                        <LockOpenIcon fontSize='small' />
+                                }
+                                {
+                                    !isLocked &&
+                                        <LockIcon fontSize='small' />
+                                }
                             </IconButton>
                             <Button size='small'
                                     disabled={ journal.actionLinks.update === undefined } 

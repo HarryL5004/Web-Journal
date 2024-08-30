@@ -206,7 +206,7 @@ export default function PageViewer({ journal, backToJournal }: Prop) {
                                 sx={{ flex: 1 }}>
                         All pages
                     </Typography>
-                    <IconButton edge="end" onClick={ handleCreateNewPage }
+                    <IconButton edge="end" onClick={ handleCreateNewPage } disabled={ journal.locked }
                                 color="inherit" aria-label="add new page">
                         <AddIcon />
                     </IconButton>
