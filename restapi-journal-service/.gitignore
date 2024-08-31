@@ -1,6 +1,7 @@
 # custom
 HELP.md
 NOTES.md
+.DS_Store
 
 .gradle
 build/
