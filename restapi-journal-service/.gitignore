@@ -1,5 +1,7 @@
+# custom
 HELP.md
 NOTES.md
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
