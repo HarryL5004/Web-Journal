@@ -8,7 +8,7 @@ This project uses [MongoDB](https://www.mongodb.com/) for data storage. The data
 
 ## Running the application
 1. Start MongoDB.
-2. Start the application: `java -jar <restapi-journal-service jar>`
+2. Start the application: `java -jar <journal-service jar>`
 3. Access the REST API with your browser (default: [http://localhost:8080/api](http://localhost:8080/api)).
 
 This project preloads sample journals in the database using the `LoadDatabase` class. Remove or comment it out if needed.
